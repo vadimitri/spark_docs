@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spark — design mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap">
+<style>
+  @font-face {
+    font-family: "Departure Mono";
+    src: url("./DepartureMono-1.500/DepartureMono-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-display: swap;
+  }
+
+  :root {
+    --bg:        #9EC8FF;
+    --fg:        #0E003B;
+    --link:      #240195;
+    --muted:     color-mix(in oklab, var(--fg) 50%, var(--bg));
+    --muted-2:   color-mix(in oklab, var(--fg) 25%, var(--bg));
+    --rule:      color-mix(in oklab, var(--fg) 60%, var(--bg));
+    --texture:   url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='3'><line x1='0' y1='0' x2='0' y2='1' stroke='%230E003B' stroke-opacity='0.18' stroke-width='1'/></svg>");
+    --content-w: 720px;
+    --serif:     "EB Garamond", "Iowan Old Style", Garamond, "Times New Roman", serif;
+    --mono:      "Departure Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  :root[data-theme="dark"] {
+    --bg:      #0E003B;
+    --fg:      #FFFFFF;
+    --link:    #9EC8FF;
+    --muted:   color-mix(in oklab, var(--fg) 50%, var(--bg));
+    --muted-2: color-mix(in oklab, var(--fg) 25%, var(--bg));
+    --rule:    color-mix(in oklab, var(--fg) 60%, var(--bg));
+    --texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='3'><line x1='0' y1='0' x2='0' y2='1' stroke='%239EC8FF' stroke-opacity='0.18' stroke-width='1'/></svg>");
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      --bg:      #0E003B;
+      --fg:      #FFFFFF;
+      --link:    #9EC8FF;
+      --muted:   color-mix(in oklab, var(--fg) 50%, var(--bg));
+      --muted-2: color-mix(in oklab, var(--fg) 25%, var(--bg));
+      --rule:    color-mix(in oklab, var(--fg) 60%, var(--bg));
+      --texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='3'><line x1='0' y1='0' x2='0' y2='1' stroke='%239EC8FF' stroke-opacity='0.18' stroke-width='1'/></svg>");
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--serif);
+    font-size: 19px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--link); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:hover { text-decoration-thickness: 2px; }
+
+  .label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+
+  /* Theme toggle */
+  .toggle {
+    position: fixed; top: 16px; right: 16px; z-index: 50;
+    font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+    background: transparent; color: var(--fg); border: 1px solid var(--fg);
+    padding: 4px 10px; cursor: pointer;
+  }
+  .toggle:hover { background: var(--fg); color: var(--bg); }
+
+  /* Section divider between mock examples */
+  .mock-divider {
+    margin: 80px auto;
+    max-width: 1400px; padding: 0 32px;
+    font-family: var(--mono); text-transform: uppercase; font-size: 11px; letter-spacing: 0.08em; color: var(--muted);
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px;
+  }
+  .mock-divider::before, .mock-divider::after {
+    content: ""; height: 8px; background-image: var(--texture); background-repeat: repeat;
+  }
+
+  /* Dotted ░ divider */
+  .dotted-rule { width: 100%; height: 14px; background-image: var(--texture); background-repeat: repeat; opacity: 0.9; margin-top: 24px; }
+
+  /* ============================ HOMEPAGE ============================ */
+  .home { max-width: 1400px; margin: 0 auto; padding: 32px; }
+
+  .home-hero {
+    min-height: 70vh;
+    display: grid; grid-template-columns: 1fr; gap: 48px;
+    align-items: end;
+    padding: 80px 0 48px;
+  }
+  @media (min-width: 1024px) {
+    .home-hero { grid-template-columns: 1.4fr 1fr; gap: 6%; padding: 96px 0 64px; }
+  }
+
+  .logo-slot {
+    border: 1px dashed var(--rule);
+    aspect-ratio: 16 / 7;
+    display: grid; place-items: center;
+    font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
+    background-image: var(--texture); background-repeat: repeat;
+  }
+
+  .home-byline { font-size: 21px; line-height: 1.55; }
+  .home-byline .label { display: block; margin-bottom: 12px; font-size: 12px; }
+  .home-byline em { font-style: italic; }
+  @media (min-width: 1024px) { .home-byline { text-align: right; } }
+
+  /* Workshop list */
+  .workshop-list { margin-top: 96px; display: grid; gap: 80px; }
+
+  a.ws-row {
+    display: grid; grid-template-columns: 1fr; gap: 24px;
+    padding-bottom: 80px;
+    border-bottom: 1px solid var(--rule);
+    color: inherit; text-decoration: none;
+  }
+  @media (min-width: 768px) { a.ws-row { grid-template-columns: 280px 1fr; gap: 48px; } }
+
+  a.ws-row:hover .ws-title { color: var(--link); }
+  a.ws-row:hover .ws-cover { border-color: var(--fg); }
+
+  .ws-cover {
+    background-image: var(--texture); background-repeat: repeat;
+    border: 1px solid var(--rule);
+    aspect-ratio: 4 / 3;
+    display: grid; place-items: center;
+    font-family: var(--mono); font-size: 10px; text-transform: uppercase; color: var(--muted);
+    transition: border-color 0.2s;
+  }
+
+  .ws-title-row { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: baseline; }
+  .ws-title { font-family: var(--serif); font-size: 36px; font-weight: 600; line-height: 1.1; margin: 0; letter-spacing: -0.015em; transition: color 0.2s; }
+  .ws-meta { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); white-space: nowrap; }
+
+  .ws-desc { margin: 16px 0 0; max-width: 60ch; line-height: 1.55; font-size: 19px; color: var(--fg); }
+  .ws-cta { margin-top: 24px; font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--link); }
+  .ws-cta::after { content: " →"; }
+
+  /* ============================ WORKSHOP PAGE ============================ */
+  .ws-page { max-width: 1400px; margin: 0 auto; padding: 32px; }
+
+  .back-link {
+    position: sticky; top: 16px; z-index: 20;
+    display: inline-block; width: fit-content;
+    font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--fg); text-decoration: none;
+    margin-bottom: 24px;
+    padding: 6px 10px;
+    background: color-mix(in oklab, var(--bg) 85%, transparent);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--rule);
+  }
+  .back-link:hover { color: var(--link); border-color: var(--fg); }
+
+  .ws-page-hero {
+    display: grid; gap: 48px;
+    min-height: 60vh;
+    padding: 80px 0 80px;
+    border-bottom: 1px solid var(--rule);
+    align-items: end;
+  }
+  @media (min-width: 1024px) { .ws-page-hero { grid-template-columns: 1fr 1fr; gap: 6%; padding: 96px 0 96px; } }
+  .ws-page-hero h1 { font-family: var(--serif); font-size: 72px; font-weight: 600; line-height: 1.02; letter-spacing: -0.02em; margin: 0; }
+  .ws-page-hero .meta { display: grid; gap: 6px; margin-top: 24px; font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  .ws-page-hero .meta span strong { color: var(--fg); font-weight: 500; }
+
+  .ws-cover-large {
+    background-image: var(--texture); background-repeat: repeat;
+    border: 1px solid var(--rule);
+    aspect-ratio: 4 / 3;
+    display: grid; place-items: center;
+    font-family: var(--mono); font-size: 11px; text-transform: uppercase; color: var(--muted);
+  }
+
+  /* 2-column body layout: TOC | prose. Ruler is fixed to viewport. */
+  .ws-body {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-top: 48px;
+  }
+  @media (min-width: 1024px) {
+    .ws-body { grid-template-columns: 220px minmax(0, 1fr); gap: 64px; }
+  }
+
+  /* Left rail TOC */
+  .toc {
+    position: relative;
+  }
+  @media (min-width: 1024px) {
+    .toc { position: sticky; top: 32px; align-self: start; max-height: calc(100vh - 64px); overflow-y: auto; }
+  }
+  .toc .label { display: block; margin-bottom: 16px; }
+  .toc ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+  .toc a {
+    color: var(--muted); text-decoration: none;
+    font-family: var(--serif); font-size: 14px; line-height: 1.4;
+    display: block;
+  }
+  .toc a:hover { color: var(--fg); }
+  .toc li.h2 a { font-weight: 600; color: var(--fg); }
+  .toc li.h3 a { padding-left: 14px; font-weight: 400; }
+  .toc li.active a { color: var(--link); }
+
+  /* Right rail progress ruler — fixed to viewport, full height, mini-map */
+  .ruler { display: none; }
+  @media (min-width: 1024px) {
+    .ruler {
+      display: flex; flex-direction: column;
+      justify-content: space-between;
+      position: fixed; top: 0; right: 14px; height: 100vh;
+      padding: 24px 0;
+      align-items: flex-end;
+      pointer-events: none;
+      z-index: 10;
+    }
+  }
+  .tick {
+    height: 1px; background: var(--muted-2); width: 10px;
+    transition: background 0.25s, width 0.25s;
+    pointer-events: auto;
+  }
+  .tick.h2 { width: 18px; height: 1.5px; background: var(--muted); }
+  .tick.passed { background: var(--link); opacity: 0.5; }
+  .tick.h2.passed { opacity: 0.7; }
+  .tick.active { background: var(--link); width: 28px; height: 2px; opacity: 1; }
+
+  /* Prose */
+  .prose { max-width: var(--content-w); }
+  .prose h2 {
+    font-family: var(--mono); font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em;
+    margin-top: 80px; margin-bottom: 24px; color: var(--fg);
+    text-align: center;
+  }
+  .prose h2.workshop-section {
+    display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center;
+    text-align: center;
+  }
+  .prose h2.workshop-section::before, .prose h2.workshop-section::after {
+    content: ""; height: 8px; background-image: var(--texture); background-repeat: repeat;
+  }
+  .prose h3 { font-family: var(--serif); font-size: 26px; font-weight: 600; margin-top: 48px; margin-bottom: 16px; line-height: 1.2; letter-spacing: -0.01em; }
+  .prose p { margin: 16px 0; }
+  .prose ul, .prose ol { margin: 16px 0; padding-left: 24px; }
+  .prose li { margin: 8px 0; }
+  .prose strong { font-weight: 600; }
+  .prose em { font-style: italic; }
+  .prose code {
+    font-family: var(--mono); font-size: 13px;
+    background: color-mix(in oklab, var(--fg) 8%, transparent);
+    padding: 1px 5px; border-radius: 2px;
+  }
+  .prose pre {
+    background: color-mix(in oklab, var(--fg) 6%, transparent);
+    border: 1px solid var(--rule);
+    padding: 14px 16px; overflow-x: auto;
+    font-family: var(--mono); font-size: 12.5px; line-height: 1.6;
+    margin: 24px 0;
+  }
+  .prose pre code { background: transparent; padding: 0; font-size: inherit; }
+  .prose .broken { color: var(--muted); text-decoration: line-through; }
+  .prose table { border-collapse: collapse; margin: 24px 0; width: 100%; font-size: 14px; }
+  .prose th, .prose td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--rule); }
+  .prose th { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); border-bottom-width: 2px; }
+
+  /* Figure with texture border */
+  .prose figure {
+    position: relative;
+    margin: 32px 0;
+    background-image: var(--texture); background-repeat: repeat;
+    padding: 32px 24px 40px;
+    display: grid; place-items: center; gap: 16px;
+  }
+  .prose figure::before, .prose figure::after,
+  .prose figure > .b-l, .prose figure > .b-r {
+    content: ""; position: absolute; background-image: var(--texture); background-repeat: repeat;
+  }
+  .prose figure::before { top: 0; left: 0; right: 0; height: 2px; }
+  .prose figure::after { bottom: 0; left: 0; right: 0; height: 2px; }
+  .prose figure > .b-l { top: 0; bottom: 0; left: 0; width: 2px; }
+  .prose figure > .b-r { top: 0; bottom: 0; right: 0; width: 2px; }
+  .prose figure .placeholder {
+    width: 100%; max-width: 480px; aspect-ratio: 4 / 3;
+    border: 1px solid var(--rule);
+    display: grid; place-items: center;
+    font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);
+    background: color-mix(in oklab, var(--bg) 90%, transparent);
+  }
+  .prose figcaption {
+    position: absolute; top: 6px; left: 14px;
+    transform-origin: top left; transform: rotate(90deg);
+    background: var(--bg); padding: 0 4px;
+    font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);
+  }
+
+  /* Footer */
+  footer {
+    max-width: 1400px; margin: 96px auto 0; padding: 32px;
+    display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center;
+    font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);
+    border-top: 1px solid var(--rule);
+  }
+  footer .center { background-image: var(--texture); background-repeat: repeat; height: 8px; }
+</style>
+</head>
+<body>
+
+<button class="toggle" id="themeToggle">Toggle theme</button>
+
+<!-- ============================ HOMEPAGE PREVIEW ============================ -->
+<section class="home" aria-label="Homepage preview">
+
+  <div class="mock-divider" style="margin-top: 0;">
+    <span>01 — Homepage</span>
+  </div>
+
+  <div class="home-hero">
+    <div class="logo-slot">[ SPARK LOGO + STAR PLACEHOLDER ]</div>
+    <div class="home-byline">
+      <span class="label">Spark · HPI Maker Club</span>
+      <p>Workshops written and built by students of the Hasso Plattner Institute. Free to read, free to fork, made with too many late nights.</p>
+    </div>
+  </div>
+
+  <div class="dotted-rule"></div>
+
+  <div class="workshop-list">
+
+    <a class="ws-row" href="#workshop">
+      <div class="ws-cover">cover · 4:3</div>
+      <div>
+        <div class="ws-title-row">
+          <h2 class="ws-title">How To Homeserver</h2>
+          <div class="ws-meta">3 pages · 12 min</div>
+        </div>
+        <p class="ws-desc">Set up your own server at home — pick the right hardware, install Docker, and deploy your first self-hosted service. Beginner-friendly.</p>
+        <div class="ws-cta">Read workshop</div>
+      </div>
+    </a>
+
+    <a class="ws-row" href="#">
+      <div class="ws-cover">cover · 4:3</div>
+      <div>
+        <div class="ws-title-row">
+          <h2 class="ws-title">Soldering 101</h2>
+          <div class="ws-meta">5 pages · 25 min</div>
+        </div>
+        <p class="ws-desc">From "what's a soldering iron" to "you just fixed a broken cable." Aimed at people who have never held one before.</p>
+        <div class="ws-cta">Read workshop</div>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- ============================ WORKSHOP PAGE PREVIEW ============================ -->
+<section class="ws-page" id="workshop" aria-label="Workshop page preview">
+
+  <div class="mock-divider">
+    <span>02 — Workshop page</span>
+  </div>
+
+  <a href="#" class="back-link">← Workshops</a>
+
+  <div class="ws-page-hero">
+    <div>
+      <h1>How To Homeserver</h1>
+      <div class="meta">
+        <span><strong>By</strong> Vadim · Lina</span>
+        <span><strong>Updated</strong> 2026·04·12</span>
+        <span><strong>3 pages</strong> · 3.7k words · 12 min read</span>
+      </div>
+    </div>
+    <div class="ws-cover-large">cover image · 4:3</div>
+  </div>
+
+  <div class="ws-body">
+
+    <!-- Left rail TOC -->
+    <nav class="toc" aria-label="On this page">
+      <span class="label">On this page</span>
+      <ul>
+        <li class="h2 active"><a href="#overview">Overview</a></li>
+        <li class="h3"><a href="#dedicated">Dedicated hardware</a></li>
+        <li class="h3"><a href="#laptop">Only a laptop</a></li>
+        <li class="h2"><a href="#os">01 OS</a></li>
+        <li class="h2"><a href="#docker">02 Installing Docker</a></li>
+        <li class="h3"><a href="#linux">Linux</a></li>
+        <li class="h3"><a href="#macos">macOS</a></li>
+        <li class="h3"><a href="#windows">Windows</a></li>
+        <li class="h2"><a href="#service">03 First service</a></li>
+        <li class="h3"><a href="#setup">Setting it up</a></li>
+        <li class="h3"><a href="#starting">Starting HomeAssistant</a></li>
+      </ul>
+    </nav>
+
+    <!-- Center prose -->
+    <article class="prose">
+
+      <h3 id="overview">Overview</h3>
+      <p>Set up your own server at home using whatever hardware you already have. We'll cover hardware choices, get Docker running, and finish with a self-hosted Home Assistant install you can use to automate your apartment.</p>
+
+      <h3 id="dedicated">Dedicated hardware</h3>
+      <p>Do you have an old laptop, mini-PC or PC tower that isn't being used? Just use it as your new server. You have the "choice" between two options:</p>
+
+      <table>
+        <thead><tr><th>Type</th><th>Old hardware</th><th>New hardware</th></tr></thead>
+        <tbody>
+          <tr><td>CPU architecture</td><td>arm</td><td>x86_64</td></tr>
+          <tr><td>CPU cores</td><td>&lt; 4</td><td>4+</td></tr>
+          <tr><td>RAM</td><td>&lt; 2GB</td><td>2GB+</td></tr>
+          <tr><td>Drive</td><td>&lt; 64GB</td><td>64GB+</td></tr>
+        </tbody>
+      </table>
+
+      <p>If your hardware falls in the lower category, see the <a href="#">Old Hardware (Raspberry Pi)</a> sub-page. Otherwise, <a href="#">New Hardware</a> walks through the Proxmox install. <span class="broken">Existing OS</span> ← that's a broken wikilink — the target file doesn't exist yet, so it renders muted+strikethrough but the page still builds.</p>
+
+      <h3 id="laptop">Only a laptop</h3>
+      <p>No dedicated hardware? No problem. Just use your laptop. Installing Docker on existing Linux / macOS / Windows is covered in the next section.</p>
+
+      <!-- ===================== Section break ===================== -->
+      <h2 class="workshop-section" id="os">·· 01 OS ··</h2>
+
+      <p>This section walks through picking and installing an OS suited to running containers 24/7. The OS choice barely matters if you're going Docker-only — pick whatever you're comfortable with.</p>
+
+      <figure>
+        <span class="b-l"></span><span class="b-r"></span>
+        <div class="placeholder">[ figure: hardware diagram ]</div>
+        <figcaption>FIG_001</figcaption>
+      </figure>
+
+      <!-- ===================== Section break ===================== -->
+      <h2 class="workshop-section" id="docker">·· 02 Installing Docker ··</h2>
+
+      <p>Docker allows you to install containers that contain an operating system and a service / program. Containers are more secure than installing a service directly on your OS. They also fix the "works on my machine", which you may be familiar with :)</p>
+
+      <h3 id="linux">Linux (Debian)</h3>
+      <p>Unfortunately, Docker is not available on Debian out of the box. Install it by running (as root):</p>
+      <pre><code>apt update                            # update packages
+apt install -yqq curl                 # install curl
+curl -sSL https://get.docker.com/ | bash</code></pre>
+
+      <h3 id="macos">macOS</h3>
+      <p>Docker is available via Docker Desktop on macOS, but the performance is quite bad. Instead, you can use <a href="https://orbstack.dev/">OrbStack</a>, which uses a different engine, but is completely compatible otherwise.</p>
+
+      <h3 id="windows">Windows</h3>
+      <p><strong>Windows is a horrible choice to use as a server, this guide is only for testing!</strong> You are required to have WSL set up already. Easiest install is <a href="#">Docker Desktop</a>.</p>
+
+      <!-- ===================== Section break ===================== -->
+      <h2 class="workshop-section" id="service">·· 03 First service ··</h2>
+
+      <p>Now that we are all on the same page we can install our first service. <strong>HomeAssistant</strong> is basically the all-in-one smart-home solution. You can use it to control and automate anything "smart" in your household — and a lot of stuff that isn't — via your phone or a web UI.</p>
+
+      <figure>
+        <span class="b-l"></span><span class="b-r"></span>
+        <div class="placeholder">[ figure: HomeAssistant UI screenshot ]</div>
+        <figcaption>FIG_002</figcaption>
+      </figure>
+
+      <h3 id="setup">Setting it up</h3>
+      <p>Start with creating a <code>compose.yml</code> file in a folder you want to store your service configs. It is recommended to create a new folder for each compose.yml (one per service).</p>
+      <p>Example: <code>HOME/Services/homeassistant/compose.yml</code></p>
+      <pre><code>services:
+  homeassistant:
+    container_name: home_assistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    volumes:
+      - ~/Services/homeassistant/data/config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    restart: unless-stopped
+    privileged: true
+    network_mode: host</code></pre>
+
+      <h3 id="starting">Starting HomeAssistant</h3>
+      <p>To start downloading and running HomeAssistant just run (in the same folder as the compose.yml file):</p>
+      <pre><code>docker compose up -d</code></pre>
+
+      <ol>
+        <li>Check if the image is already downloaded; if not, download it.</li>
+        <li>Start the service in the background (<code>-d</code> = detached).</li>
+        <li>Open <a href="http://localhost:8123">http://localhost:8123</a> in your browser to set up HomeAssistant.</li>
+      </ol>
+
+    </article>
+
+  </div>
+
+  <!-- Ruler is fixed to viewport, sibling of .ws-body -->
+  <aside class="ruler" aria-hidden="true">
+    <div class="tick h2 passed"></div>
+    <div class="tick passed"></div><div class="tick passed"></div><div class="tick passed"></div>
+    <div class="tick h2 passed"></div>
+    <div class="tick passed"></div><div class="tick passed"></div>
+    <div class="tick h2 passed"></div>
+    <div class="tick passed"></div><div class="tick passed"></div>
+    <div class="tick h2 passed"></div>
+    <div class="tick passed"></div><div class="tick passed"></div><div class="tick passed"></div>
+    <div class="tick h2 active"></div>
+    <div class="tick"></div><div class="tick"></div><div class="tick"></div>
+    <div class="tick h2"></div>
+    <div class="tick"></div><div class="tick"></div>
+    <div class="tick h2"></div>
+    <div class="tick"></div><div class="tick"></div><div class="tick"></div>
+    <div class="tick h2"></div>
+    <div class="tick"></div><div class="tick"></div>
+    <div class="tick h2"></div>
+    <div class="tick"></div><div class="tick"></div>
+  </aside>
+</section>
+
+<footer>
+  <span>SPARK · HPI</span>
+  <div class="center"></div>
+  <span>v0.1 · made with EB Garamond &amp; Departure Mono</span>
+</footer>
+
+<script>
+  // Theme toggle (cycles light → dark → system)
+  const root = document.documentElement;
+  const btn = document.getElementById("themeToggle");
+  const order = ["light", "dark", null];
+  let i = 2;
+  btn.addEventListener("click", () => {
+    i = (i + 1) % order.length;
+    if (order[i] === null) root.removeAttribute("data-theme");
+    else root.setAttribute("data-theme", order[i]);
+    btn.textContent = order[i] ? `Theme: ${order[i]}` : "Theme: system";
+  });
+</script>
+</body>
+</html>
