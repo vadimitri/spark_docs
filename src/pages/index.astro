@@ -1,17 +1,69 @@
 ---
+import Base from "../layouts/Base.astro";
+import ThemeToggle from "../components/ThemeToggle.astro";
+import DottedRule from "../components/DottedRule.astro";
+import WorkshopCard from "../components/WorkshopCard.astro";
+import Footer from "../components/Footer.astro";
+import { loadContent } from "../lib/load-content";
+import { slugify, stripNumericPrefix } from "../lib/slugify";
 
+const { hierarchy } = loadContent();
+
+const cards = hierarchy.workshops.map((w) => {
+  const title = w.title ?? stripNumericPrefix(w.filename.replace(/\.md$/, ""));
+  const wordCount = [w, ...w.children].reduce(
+    (sum, n) => sum + (n.rawContent ?? "").split(/\s+/).filter(Boolean).length,
+    0
+  );
+  return {
+    href: `/${slugify(title)}`,
+    title,
+    description: w.description,
+    cover: w.cover,
+    pageCount: 1 + w.children.length,
+    wordCount,
+  };
+});
 ---
+<Base title="Spark — HPI maker club">
+  <ThemeToggle />
+  <section class="home">
+    <div class="home-hero">
+      <div class="logo-slot">[ SPARK LOGO + STAR PLACEHOLDER ]</div>
+      <div class="home-byline">
+        <span class="label">Spark · HPI Maker Club</span>
+        <p>Workshops written and built by students of the Hasso Plattner Institute.</p>
+      </div>
+    </div>
+    <DottedRule />
+    <div class="workshop-list">
+      {cards.map((c) => <WorkshopCard {...c} />)}
+    </div>
+  </section>
+  <Footer />
+</Base>
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<style>
+  .home { max-width: 1400px; margin: 0 auto; padding: 32px; }
+  .home-hero {
+    min-height: 70vh;
+    display: grid; grid-template-columns: 1fr; gap: 48px;
+    align-items: end;
+    padding: 80px 0 48px;
+  }
+  @media (min-width: 1024px) {
+    .home-hero { grid-template-columns: 1.4fr 1fr; gap: 6%; padding: 96px 0 64px; }
+  }
+  .logo-slot {
+    border: 1px dashed var(--rule);
+    aspect-ratio: 16 / 7;
+    display: grid; place-items: center;
+    font-family: var(--mono); font-size: 12px;
+    text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
+    background-image: var(--texture); background-repeat: repeat;
+  }
+  .home-byline { font-size: 21px; line-height: 1.55; }
+  .home-byline .label { display: block; margin-bottom: 12px; font-size: 12px; }
+  @media (min-width: 1024px) { .home-byline { text-align: right; } }
+  .workshop-list { margin-top: 96px; display: grid; gap: 80px; }
+</style>
