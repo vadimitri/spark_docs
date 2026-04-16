@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { defineCollection, z } from "astro:content";
 import { loadContent } from "./lib/load-content";
 import { slugify, stripNumericPrefix } from "./lib/slugify";
