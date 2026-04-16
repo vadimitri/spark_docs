@@ -1,0 +1,31 @@
+---
+export interface TocItem { id: string; text: string; depth: 2 | 3 }
+interface Props { items: TocItem[] }
+const { items } = Astro.props;
+---
+<nav class="toc" aria-label="On this page">
+  <span class="label">On this page</span>
+  <ul>
+    {items.map((it) => (
+      <li class={`h${it.depth}`}><a href={`#${it.id}`} data-toc-link={it.id}>{it.text}</a></li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .toc { position: relative; }
+  @media (min-width: 1024px) {
+    .toc { position: sticky; top: 32px; align-self: start; max-height: calc(100vh - 64px); overflow-y: auto; }
+  }
+  .toc .label { display: block; margin-bottom: 16px; }
+  .toc ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+  .toc a {
+    color: var(--muted); text-decoration: none;
+    font-family: var(--serif); font-size: 14px; line-height: 1.4;
+    display: block;
+  }
+  .toc a:hover { color: var(--fg); }
+  .toc li.h2 a { font-weight: 600; color: var(--fg); }
+  .toc li.h3 a { padding-left: 14px; font-weight: 400; }
+  .toc li.active a { color: var(--link); }
+</style>
