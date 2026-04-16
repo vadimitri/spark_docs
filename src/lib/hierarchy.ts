@@ -1,0 +1,94 @@
+import { comparePages } from "./sort-key";
+
+export interface RawPage {
+  filename: string;
+  upTargets: string[];
+  title?: string;
+  description?: string;
+  cover?: string;
+  authors?: string[];
+  date?: string;
+  order?: number;
+  rawContent?: string;
+}
+
+export interface HierNode extends RawPage {
+  depth: 0 | 1 | 2;
+  parent?: HierNode;
+  children: HierNode[];
+  workshopRootFilename: string;
+}
+
+export interface Hierarchy {
+  workshops: HierNode[];
+  byFilename: Map<string, HierNode>;
+  byBasename: Map<string, HierNode>;
+}
+
+function basename(filename: string): string {
+  return filename.replace(/\.md$/i, "");
+}
+
+export function buildHierarchy(pages: RawPage[]): Hierarchy {
+  const byFilename = new Map<string, HierNode>();
+  const byBasename = new Map<string, HierNode>();
+
+  for (const p of pages) {
+    const node: HierNode = {
+      ...p,
+      upTargets: p.upTargets ?? [],
+      depth: 0,
+      children: [],
+      workshopRootFilename: p.filename,
+    };
+    byFilename.set(p.filename, node);
+    byBasename.set(basename(p.filename), node);
+  }
+
+  // Resolve parent (one hop — the parent is directly the byBasename lookup of the first upTarget)
+  for (const node of byFilename.values()) {
+    const upName = node.upTargets[0];
+    if (!upName) continue;
+    const parent = byBasename.get(upName);
+    if (!parent || parent === node) continue;
+    node.parent = parent;
+  }
+
+  // Compute depth from parent chain length (capped at 2)
+  const computeDepth = (n: HierNode): 0 | 1 | 2 => {
+    let d = 0;
+    let cur: HierNode | undefined = n.parent;
+    while (cur && d < 2) {
+      d++;
+      cur = cur.parent;
+    }
+    return d as 0 | 1 | 2;
+  };
+  for (const node of byFilename.values()) {
+    node.depth = computeDepth(node);
+  }
+
+  // Compute workshop root filename (walk to depth-0 ancestor)
+  for (const node of byFilename.values()) {
+    let cur: HierNode = node;
+    while (cur.parent) cur = cur.parent;
+    node.workshopRootFilename = cur.filename;
+  }
+
+  // Wire children
+  for (const node of byFilename.values()) {
+    if (node.parent) node.parent.children.push(node);
+  }
+
+  // Sort children of every node
+  for (const node of byFilename.values()) {
+    node.children.sort(comparePages);
+  }
+
+  // Collect workshops (depth-0 nodes), sorted
+  const workshops = [...byFilename.values()]
+    .filter((n) => n.depth === 0)
+    .sort(comparePages);
+
+  return { workshops, byFilename, byBasename };
+}
