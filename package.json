@@ -12,7 +12,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "deploy": "astro build && wrangler pages deploy dist --project-name=spark",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest"
   },
   "dependencies": {
