@@ -1,0 +1,87 @@
+---
+import type { TocItem } from "./TocRail.astro";
+interface Props { items: TocItem[] }
+const { items } = Astro.props;
+---
+<aside class="ruler" aria-hidden="true">
+  {items.map((it) => (
+    <div class={`tick h${it.depth}`} data-tick-id={it.id}></div>
+  ))}
+</aside>
+
+<style>
+  .ruler { display: none; }
+  @media (min-width: 1024px) {
+    .ruler {
+      display: flex; flex-direction: column;
+      justify-content: space-between;
+      position: fixed; top: 0; right: 14px; height: 100vh;
+      padding: 24px 0;
+      align-items: flex-end;
+      pointer-events: none;
+      z-index: 10;
+    }
+  }
+  .tick {
+    height: 1px; background: var(--muted-2); width: 10px;
+    transition: background 0.25s, width 0.25s, opacity 0.25s;
+    pointer-events: auto;
+  }
+  .tick.h2 { width: 18px; height: 1.5px; background: var(--muted); }
+  .tick.passed { background: var(--link); opacity: 0.5; }
+  .tick.h2.passed { opacity: 0.7; }
+  .tick.active { background: var(--link); width: 28px; height: 2px; opacity: 1; }
+</style>
+
+<script>
+  // Drives both .toc li.active and .ruler .tick.active/passed
+  const headings = Array.from(
+    document.querySelectorAll<HTMLElement>(".prose h2[id], .prose h3[id]")
+  );
+  if (headings.length > 0) {
+    const tocLinks = new Map<string, HTMLElement>();
+    document
+      .querySelectorAll<HTMLElement>("[data-toc-link]")
+      .forEach((el) => tocLinks.set(el.dataset.tocLink!, el));
+
+    const ticks = new Map<string, HTMLElement>();
+    document
+      .querySelectorAll<HTMLElement>("[data-tick-id]")
+      .forEach((el) => ticks.set(el.dataset.tickId!, el));
+
+    const orderedIds = headings.map((h) => h.id);
+    let activeId: string | null = null;
+
+    function setActive(id: string | null) {
+      if (activeId === id) return;
+      if (activeId) {
+        tocLinks.get(activeId)?.parentElement?.classList.remove("active");
+        ticks.get(activeId)?.classList.remove("active");
+      }
+      activeId = id;
+      if (!id) return;
+      tocLinks.get(id)?.parentElement?.classList.add("active");
+      ticks.get(id)?.classList.add("active");
+      const idx = orderedIds.indexOf(id);
+      orderedIds.forEach((hid, i) => {
+        const t = ticks.get(hid);
+        if (!t) return;
+        if (i < idx) t.classList.add("passed");
+        else t.classList.remove("passed");
+      });
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length > 0) {
+          setActive((visible[0].target as HTMLElement).id);
+        }
+      },
+      { rootMargin: "0px 0px -75% 0px", threshold: 0 }
+    );
+    headings.forEach((h) => observer.observe(h));
+  }
+</script>
