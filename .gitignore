@@ -22,3 +22,17 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# project additions
+.env
+.DS_Store
+mock.html
+pretty.html
+pretty.css
+chapter.html
+e36a228c4137a305.css
+Making Software.html
+Making Software: What is a color space?.html
+texture.svg
+DepartureMono-1.500/
+website/
