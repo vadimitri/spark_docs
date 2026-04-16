@@ -1,0 +1,77 @@
+---
+import Base from "../../layouts/Base.astro";
+import ThemeToggle from "../../components/ThemeToggle.astro";
+import BackLink from "../../components/BackLink.astro";
+import TocRail from "../../components/TocRail.astro";
+import ProgressRuler from "../../components/ProgressRuler.astro";
+import Footer from "../../components/Footer.astro";
+import { loadContent } from "../../lib/load-content";
+import { renderSubpage } from "../../lib/render-workshop";
+import { slugify, stripNumericPrefix } from "../../lib/slugify";
+
+export async function getStaticPaths() {
+  const { hierarchy } = loadContent();
+  const out: { params: { workshop: string; subpage: string }; props: { filename: string } }[] = [];
+  for (const node of hierarchy.byFilename.values()) {
+    if (node.depth !== 2) continue;
+    const root = hierarchy.byFilename.get(node.workshopRootFilename)!;
+    const workshopTitle = root.title ?? stripNumericPrefix(root.filename.replace(/\.md$/, ""));
+    const subTitle = node.title ?? stripNumericPrefix(node.filename.replace(/\.md$/, ""));
+    out.push({
+      params: { workshop: slugify(workshopTitle), subpage: slugify(subTitle) },
+      props: { filename: node.filename },
+    });
+  }
+  return out;
+}
+
+const { filename } = Astro.props as { filename: string };
+const { hierarchy } = loadContent();
+const node = hierarchy.byFilename.get(filename)!;
+const root = hierarchy.byFilename.get(node.workshopRootFilename)!;
+const workshopTitle = root.title ?? stripNumericPrefix(root.filename.replace(/\.md$/, ""));
+const subTitle = node.title ?? stripNumericPrefix(node.filename.replace(/\.md$/, ""));
+const rendered = await renderSubpage(node, hierarchy);
+---
+<Base title={`${subTitle} — ${workshopTitle} — Spark`}>
+  <ThemeToggle />
+  <section class="ws-page">
+    <BackLink href={`/${slugify(workshopTitle)}`} label={workshopTitle} />
+    <header class="sub-hero">
+      <p class="crumb">{workshopTitle} / {subTitle}</p>
+      <h1>{subTitle}</h1>
+    </header>
+    <div class="ws-body">
+      <TocRail items={rendered.toc} />
+      <article class="prose" set:html={rendered.html}></article>
+    </div>
+    <ProgressRuler items={rendered.toc} />
+  </section>
+  <Footer />
+</Base>
+
+<style>
+  .ws-page { max-width: 1400px; margin: 0 auto; padding: 32px; }
+  .sub-hero { padding: 64px 0; border-bottom: 1px solid var(--rule); }
+  .sub-hero .crumb {
+    font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--muted); margin: 0 0 12px;
+  }
+  .sub-hero h1 {
+    font-family: var(--serif); font-size: 56px; font-weight: 600;
+    line-height: 1.05; letter-spacing: -0.015em; margin: 0;
+  }
+  .ws-body { display: grid; grid-template-columns: 1fr; margin-top: 48px; }
+  @media (min-width: 1024px) {
+    .ws-body { grid-template-columns: 220px minmax(0, 1fr); gap: 64px; }
+  }
+  .prose { max-width: var(--content-w); }
+  .prose :global(h2) { font-family: var(--serif); font-size: 28px; font-weight: 600; margin-top: 48px; margin-bottom: 16px; }
+  .prose :global(h3) { font-family: var(--serif); font-size: 22px; font-weight: 600; margin-top: 32px; margin-bottom: 12px; }
+  .prose :global(p) { margin: 16px 0; }
+  .prose :global(.broken) { color: var(--muted); text-decoration: line-through; }
+  .prose :global(code) { font-family: var(--mono); font-size: 13px; background: color-mix(in oklab, var(--fg) 8%, transparent); padding: 1px 5px; border-radius: 2px; }
+  .prose :global(pre) { background: color-mix(in oklab, var(--fg) 6%, transparent); border: 1px solid var(--rule); padding: 14px 16px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; margin: 24px 0; }
+  .prose :global(pre code) { background: transparent; padding: 0; font-size: inherit; }
+  .prose :global(img) { max-width: 100%; height: auto; }
+</style>
