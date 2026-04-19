@@ -1,43 +1,81 @@
-# Astro Starter Kit: Minimal
+# Spark
+
+Source for the Spark workshop site. Workshops are authored in Markdown
+(Obsidian-flavored: wikilinks, `up:` frontmatter, callouts) and compiled into
+a static Astro site.
+
+## Prerequisites
+
+- Node.js ≥ 22.12
+- A folder of workshop Markdown files (the path you set in `.env`).
+
+## Setup
 
 ```sh
-npm create astro@latest -- --template minimal
+npm install
+cp .env.example .env       # or create .env directly
+# edit .env so CONTENT_PATH points at your workshop folder
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+`CONTENT_PATH` is an absolute path to a folder structured like this:
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```
+<CONTENT_PATH>/
+  01 Workshop Name.md               # workshop root
+  01 Workshop Name/                 # optional child-page directory
+    01 Intro.md                     # child pages; need `up: "[[01 Workshop Name]]"`
+    02 Setup.md
+    images/                         # images referenced by this workshop's pages
+      cover.png
+      diagram.svg
+  02 Another Workshop.md
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Child pages without an explicit `up:` in frontmatter are auto-parented to the
+workshop whose name matches their enclosing folder.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Authoring
 
-Any static assets, like images, can be placed in the `public/` directory.
+- **Wikilinks:** `[[Other Workshop]]`, `[[Other Workshop|alias]]`,
+  `[[Other Workshop#Heading]]`. Broken links render as muted strikethrough.
+- **Images:** standard Markdown `![alt](images/foo.png)`. Images in
+  `<workshop>/images/` are copied into `public/images/<workshop>/` at build
+  time.
+- **Callouts:** Obsidian-style. Supported types: `note`, `info`, `tip`,
+  `success`, `warning`, `failure`, `danger`, `bug`, `example`, `quote`,
+  `abstract`, `todo`, `question`. Fold markers (`+` / `-`) are parsed but
+  ignored — callouts always render expanded.
 
-## 🧞 Commands
+  ```markdown
+  > [!warning] Optional title
+  > Body text.
+  ```
 
-All commands are run from the root of the project, from a terminal:
+- **Frontmatter** (all fields optional):
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+  ```yaml
+  ---
+  title: Workshop Name
+  description: One-line homepage tagline
+  order: 2                       # controls homepage order
+  cover: images/my-workshop/cover.png
+  authors: [Vadim, Lina]
+  date: 2026-04-12
+  up: "[[Parent Workshop]]"      # child pages only
+  ---
+  ```
 
-## 👀 Want to learn more?
+## Commands
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+```sh
+npm run dev       # dev server at http://localhost:4321 with hot reload
+npm run build     # static build into dist/
+npm run preview   # preview the built site locally
+npm test          # vitest
+```
+
+## Contributing
+
+Fork, branch, PR. Keep PRs small and focused. Site deploys are handled by a
+core maintainer — contributors don't need deploy access to be useful.
