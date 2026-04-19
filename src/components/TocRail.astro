@@ -1,5 +1,6 @@
 ---
-export interface TocItem { id: string; text: string; depth: 2 | 3 }
+import type { TocItem } from "../lib/extract-toc";
+export type { TocItem };
 interface Props { items: TocItem[] }
 const { items } = Astro.props;
 ---
@@ -7,7 +8,9 @@ const { items } = Astro.props;
   <span class="label">On this page</span>
   <ul>
     {items.map((it) => (
-      <li class={`h${it.depth}`}><a href={`#${it.id}`} data-toc-link={it.id}>{it.text}</a></li>
+      <li class={`tier-${it.tier}`}>
+        <a href={`#${it.id}`} data-toc-link={it.id}>{it.text}</a>
+      </li>
     ))}
   </ul>
 </nav>
@@ -15,17 +18,43 @@ const { items } = Astro.props;
 <style>
   .toc { position: relative; }
   @media (min-width: 1024px) {
-    .toc { position: sticky; top: 32px; align-self: start; max-height: calc(100vh - 64px); overflow-y: auto; }
+    .toc {
+      position: sticky; top: 32px; align-self: start;
+      max-height: calc(100vh - 64px); overflow-y: auto;
+    }
   }
-  .toc .label { display: block; margin-bottom: 16px; }
+  .toc .label {
+    display: block; margin-bottom: 16px;
+    font-family: var(--mono); font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted);
+  }
   .toc ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
   .toc a {
     color: var(--muted); text-decoration: none;
-    font-family: var(--serif); font-size: 14px; line-height: 1.4;
-    display: block;
+    display: block; line-height: 1.4;
   }
   .toc a:hover { color: var(--fg); }
-  .toc li.h2 a { font-weight: 600; color: var(--fg); }
-  .toc li.h3 a { padding-left: 14px; font-weight: 400; }
   .toc li.active a { color: var(--link); }
+
+  /* Tier styles — chapter (mono small caps), then serif hierarchy */
+  .toc li.tier-chapter a {
+    font-family: var(--mono); font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--fg); font-weight: 600;
+    margin-top: 12px;
+  }
+  .toc li.tier-chapter:first-child a { margin-top: 0; }
+  .toc li.tier-h1 a {
+    font-family: var(--serif); font-size: 15px; font-weight: 600;
+    color: var(--fg);
+  }
+  .toc li.tier-h2 a {
+    font-family: var(--serif); font-size: 14px; font-weight: 500;
+    padding-left: 14px;
+  }
+  .toc li.tier-h3 a {
+    font-family: var(--serif); font-size: 13px; font-weight: 400;
+    padding-left: 28px;
+  }
 </style>
