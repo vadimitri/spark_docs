@@ -15,13 +15,31 @@
       .querySelectorAll<HTMLElement>("[data-toc-link]")
       .forEach((el) => tocLinks.set(el.dataset.tocLink!, el));
 
+    // Map every heading id → the id of the chapter-divider that contains it
+    // (the most recent chapter-divider in DOM order). Used to keep the chapter
+    // TOC entry highlighted while scrolling through that chapter's contents.
+    const headingToChapter = new Map<string, string>();
+    let runningChapter: string | null = null;
+    headings.forEach((h) => {
+      if (h.classList.contains("chapter-divider")) runningChapter = h.id;
+      if (runningChapter) headingToChapter.set(h.id, runningChapter);
+    });
+
     let activeId: string | null = null;
+    let activeChapter: string | null = null;
 
     function setActive(id: string | null) {
       if (activeId === id) return;
       if (activeId) tocLinks.get(activeId)?.parentElement?.classList.remove("active");
       activeId = id;
       if (id) tocLinks.get(id)?.parentElement?.classList.add("active");
+
+      const newChapter = id ? headingToChapter.get(id) ?? null : null;
+      if (newChapter !== activeChapter) {
+        if (activeChapter) tocLinks.get(activeChapter)?.parentElement?.classList.remove("in-chapter");
+        activeChapter = newChapter;
+        if (activeChapter) tocLinks.get(activeChapter)?.parentElement?.classList.add("in-chapter");
+      }
     }
 
     const observer = new IntersectionObserver(

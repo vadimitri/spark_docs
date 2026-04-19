@@ -46,6 +46,8 @@ const { items } = Astro.props;
     margin-top: 12px;
   }
   .toc li.tier-chapter:first-child a { margin-top: 0; }
+  .toc li.tier-chapter.active a,
+  .toc li.tier-chapter.in-chapter a { color: #d4e3fe; }
   .toc li.tier-h1 a {
     font-family: var(--serif); font-size: 15px; font-weight: 600;
     color: var(--fg);
