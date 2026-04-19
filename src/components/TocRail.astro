@@ -44,10 +44,20 @@ const { items } = Astro.props;
     text-transform: uppercase; letter-spacing: 0.08em;
     color: var(--fg); font-weight: 600;
     margin-top: 12px;
+    position: relative;
   }
   .toc li.tier-chapter:first-child a { margin-top: 0; }
-  .toc li.tier-chapter.active a,
-  .toc li.tier-chapter.in-chapter a { color: #d4e3fe; }
+  .toc li.tier-chapter a::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -3px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 300ms ease;
+  }
+  .toc li.tier-chapter.in-chapter a::after { transform: scaleX(1); }
   .toc li.tier-h1 a {
     font-family: var(--serif); font-size: 15px; font-weight: 600;
     color: var(--fg);
