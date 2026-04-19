@@ -7,6 +7,7 @@ import rehypeStringify from "rehype-stringify";
 import { visit } from "unist-util-visit";
 import type { Root as MdastRoot, Heading } from "mdast";
 import { remarkWikilinks, type WikiResolver } from "./remark-wikilinks";
+import { remarkCallouts } from "./remark-callouts";
 import { slugify, stripNumericPrefix, shortName } from "./slugify";
 import type { HierNode, Hierarchy } from "./hierarchy";
 import { extractToc, type TocItem } from "./extract-toc";
@@ -174,6 +175,7 @@ export async function renderWorkshop(
 
   const processor = unified()
     .use(remarkGfm)
+    .use(remarkCallouts)
     .use(remarkWikilinks, { resolver })
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(addHeadingIds)
@@ -201,6 +203,7 @@ export async function renderSubpage(
 
   const processor = unified()
     .use(remarkGfm)
+    .use(remarkCallouts)
     .use(remarkWikilinks, { resolver })
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(addHeadingIds)

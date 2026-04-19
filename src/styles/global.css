@@ -1,47 +1,407 @@
 @import "./fonts.css";
 
 :root {
-  --bg:    #9EC8FF;
-  --fg:    #0E003B;
-  --link:  #240195;
-  --muted:   color-mix(in oklab, var(--fg) 50%, var(--bg));
-  --muted-2: color-mix(in oklab, var(--fg) 25%, var(--bg));
-  --rule:    color-mix(in oklab, var(--fg) 60%, var(--bg));
-  --texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='3'><line x1='0' y1='0' x2='0' y2='1' stroke='%230E003B' stroke-opacity='0.18' stroke-width='1'/></svg>");
-  --content-w: 720px;
-  --serif: "EB Garamond", "Iowan Old Style", Garamond, "Times New Roman", serif;
-  --mono:  "Departure Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --display: "Clash Grotesk", system-ui, sans-serif;
+	--bg: #d4e3fe;
+	--fg: #11053b;
+	--link: #3a88fe;
+	--muted: color-mix(in oklab, var(--fg) 50%, var(--bg));
+	--muted-2: color-mix(in oklab, var(--fg) 25%, var(--bg));
+	--rule: color-mix(in oklab, var(--fg) 60%, var(--bg));
+	--texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='3'><line x1='0' y1='0' x2='0' y2='1' stroke='%230E003B' stroke-opacity='0.5' stroke-width='1'/></svg>");
+	--content-w: 720px;
+	--serif:
+		"EB Garamond", "Iowan Old Style", Garamond, "Times New Roman", serif;
+	--mono:
+		"Departure Mono", ui-monospace, SFMono-Regular, Menlo, Consolas,
+		monospace;
+	--display: "Clash Grotesk", system-ui, sans-serif;
+	--logo: "Epoch";
 }
 
 :root[data-theme="dark"] {
-  --bg:   #0E003B;
-  --fg:   #FFFFFF;
-  --link: #9EC8FF;
-  --texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='3'><line x1='0' y1='0' x2='0' y2='1' stroke='%239EC8FF' stroke-opacity='0.18' stroke-width='1'/></svg>");
+	--bg: #101010;
+	--fg: #ffffff;
+	--link: #3a88fe;
+	--texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='3'><line x1='0' y1='0' x2='0' y2='1' stroke='%239EC8FF' stroke-opacity='0.18' stroke-width='1'/></svg>");
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) {
-    --bg:   #0E003B;
-    --fg:   #FFFFFF;
-    --link: #9EC8FF;
-    --texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='3'><line x1='0' y1='0' x2='0' y2='1' stroke='%239EC8FF' stroke-opacity='0.18' stroke-width='1'/></svg>");
-  }
+	:root:not([data-theme]) {
+		--bg: #101010;
+		--fg: #ffffff;
+		--link: #3a88fe;
+		--texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='3'><line x1='0' y1='0' x2='0' y2='1' stroke='%239EC8FF' stroke-opacity='0.18' stroke-width='1'/></svg>");
+	}
 }
 
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
+* {
+	box-sizing: border-box;
+}
+html,
 body {
-  background: var(--bg);
-  color: var(--fg);
-  font-family: var(--serif);
-  font-size: 19px;
-  line-height: 1.65;
-  -webkit-font-smoothing: antialiased;
+	margin: 0;
+	padding: 0;
+}
+body {
+	background: var(--bg);
+	color: var(--fg);
+	font-family: var(--serif);
+	font-size: 19px;
+	line-height: 1.65;
+	-webkit-font-smoothing: antialiased;
 }
 
-a { color: var(--link); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
-a:hover { text-decoration-thickness: 2px; }
+a {
+	color: var(--link);
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 2px;
+}
+a:hover {
+	text-decoration-thickness: 2px;
+}
 
-.label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+/* ── Syntax highlighting (GitHub light / dark) ── */
+pre code.hljs {
+	display: block;
+	overflow-x: auto;
+	padding: 0;
+}
+code.hljs {
+	padding: 0;
+}
+.hljs {
+	color: #24292e;
+	background: transparent;
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+	color: #d73a49;
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+	color: #6f42c1;
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+	color: #005cc5;
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+	color: #032f62;
+}
+.hljs-built_in,
+.hljs-symbol {
+	color: #e36209;
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+	color: #6a737d;
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+	color: #22863a;
+}
+.hljs-subst {
+	color: #24292e;
+}
+.hljs-section {
+	color: #005cc5;
+	font-weight: bold;
+}
+.hljs-bullet {
+	color: #735c0f;
+}
+.hljs-emphasis {
+	color: #24292e;
+	font-style: italic;
+}
+.hljs-strong {
+	color: #24292e;
+	font-weight: bold;
+}
+.hljs-addition {
+	color: #22863a;
+	background-color: #f0fff4;
+}
+.hljs-deletion {
+	color: #b31d28;
+	background-color: #ffeef0;
+}
+
+:root[data-theme="dark"] .hljs {
+	color: #c9d1d9;
+}
+:root[data-theme="dark"] .hljs-doctag,
+:root[data-theme="dark"] .hljs-keyword,
+:root[data-theme="dark"] .hljs-meta .hljs-keyword,
+:root[data-theme="dark"] .hljs-template-tag,
+:root[data-theme="dark"] .hljs-template-variable,
+:root[data-theme="dark"] .hljs-type,
+:root[data-theme="dark"] .hljs-variable.language_ {
+	color: #ff7b72;
+}
+:root[data-theme="dark"] .hljs-title,
+:root[data-theme="dark"] .hljs-title.class_,
+:root[data-theme="dark"] .hljs-title.class_.inherited__,
+:root[data-theme="dark"] .hljs-title.function_ {
+	color: #d2a8ff;
+}
+:root[data-theme="dark"] .hljs-attr,
+:root[data-theme="dark"] .hljs-attribute,
+:root[data-theme="dark"] .hljs-literal,
+:root[data-theme="dark"] .hljs-meta,
+:root[data-theme="dark"] .hljs-number,
+:root[data-theme="dark"] .hljs-operator,
+:root[data-theme="dark"] .hljs-variable,
+:root[data-theme="dark"] .hljs-selector-attr,
+:root[data-theme="dark"] .hljs-selector-class,
+:root[data-theme="dark"] .hljs-selector-id {
+	color: #79c0ff;
+}
+:root[data-theme="dark"] .hljs-regexp,
+:root[data-theme="dark"] .hljs-string,
+:root[data-theme="dark"] .hljs-meta .hljs-string {
+	color: #a5d6ff;
+}
+:root[data-theme="dark"] .hljs-built_in,
+:root[data-theme="dark"] .hljs-symbol {
+	color: #ffa657;
+}
+:root[data-theme="dark"] .hljs-comment,
+:root[data-theme="dark"] .hljs-code,
+:root[data-theme="dark"] .hljs-formula {
+	color: #8b949e;
+}
+:root[data-theme="dark"] .hljs-name,
+:root[data-theme="dark"] .hljs-quote,
+:root[data-theme="dark"] .hljs-selector-tag,
+:root[data-theme="dark"] .hljs-selector-pseudo {
+	color: #7ee787;
+}
+:root[data-theme="dark"] .hljs-subst {
+	color: #c9d1d9;
+}
+:root[data-theme="dark"] .hljs-section {
+	color: #1f6feb;
+	font-weight: bold;
+}
+:root[data-theme="dark"] .hljs-bullet {
+	color: #f2cc60;
+}
+:root[data-theme="dark"] .hljs-emphasis {
+	color: #c9d1d9;
+	font-style: italic;
+}
+:root[data-theme="dark"] .hljs-strong {
+	color: #c9d1d9;
+	font-weight: bold;
+}
+:root[data-theme="dark"] .hljs-addition {
+	color: #aff5b4;
+	background-color: #033a16;
+}
+:root[data-theme="dark"] .hljs-deletion {
+	color: #ffdcd7;
+	background-color: #67060c;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme]) .hljs {
+		color: #c9d1d9;
+	}
+	:root:not([data-theme]) .hljs-doctag,
+	:root:not([data-theme]) .hljs-keyword,
+	:root:not([data-theme]) .hljs-meta .hljs-keyword,
+	:root:not([data-theme]) .hljs-template-tag,
+	:root:not([data-theme]) .hljs-template-variable,
+	:root:not([data-theme]) .hljs-type,
+	:root:not([data-theme]) .hljs-variable.language_ {
+		color: #ff7b72;
+	}
+	:root:not([data-theme]) .hljs-title,
+	:root:not([data-theme]) .hljs-title.class_,
+	:root:not([data-theme]) .hljs-title.class_.inherited__,
+	:root:not([data-theme]) .hljs-title.function_ {
+		color: #d2a8ff;
+	}
+	:root:not([data-theme]) .hljs-attr,
+	:root:not([data-theme]) .hljs-attribute,
+	:root:not([data-theme]) .hljs-literal,
+	:root:not([data-theme]) .hljs-meta,
+	:root:not([data-theme]) .hljs-number,
+	:root:not([data-theme]) .hljs-operator,
+	:root:not([data-theme]) .hljs-variable,
+	:root:not([data-theme]) .hljs-selector-attr,
+	:root:not([data-theme]) .hljs-selector-class,
+	:root:not([data-theme]) .hljs-selector-id {
+		color: #79c0ff;
+	}
+	:root:not([data-theme]) .hljs-regexp,
+	:root:not([data-theme]) .hljs-string,
+	:root:not([data-theme]) .hljs-meta .hljs-string {
+		color: #a5d6ff;
+	}
+	:root:not([data-theme]) .hljs-built_in,
+	:root:not([data-theme]) .hljs-symbol {
+		color: #ffa657;
+	}
+	:root:not([data-theme]) .hljs-comment,
+	:root:not([data-theme]) .hljs-code,
+	:root:not([data-theme]) .hljs-formula {
+		color: #8b949e;
+	}
+	:root:not([data-theme]) .hljs-name,
+	:root:not([data-theme]) .hljs-quote,
+	:root:not([data-theme]) .hljs-selector-tag,
+	:root:not([data-theme]) .hljs-selector-pseudo {
+		color: #7ee787;
+	}
+	:root:not([data-theme]) .hljs-subst {
+		color: #c9d1d9;
+	}
+	:root:not([data-theme]) .hljs-addition {
+		color: #aff5b4;
+		background-color: #033a16;
+	}
+	:root:not([data-theme]) .hljs-deletion {
+		color: #ffdcd7;
+		background-color: #67060c;
+	}
+}
+
+.label {
+	font-family: var(--mono);
+	font-size: 11px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--fg);
+}
+
+/* ── Code block copy button ── */
+.code-block {
+	position: relative;
+}
+.code-block pre {
+	padding-right: 2.75rem;
+}
+.copy-btn {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 26px;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	color: var(--fg);
+	cursor: pointer;
+	opacity: 0.35;
+	transition: opacity 120ms ease;
+}
+.code-block:hover .copy-btn,
+.copy-btn:focus-visible {
+	opacity: 0.9;
+}
+.copy-icon {
+	display: block;
+	width: 18px;
+	height: 22px;
+	background-color: currentColor;
+	-webkit-mask: url("/copy_icon.svg") no-repeat center / contain;
+	mask: url("/copy_icon.svg") no-repeat center / contain;
+}
+.copy-done {
+	display: none;
+	font-family: var(--mono);
+	font-size: 14px;
+	line-height: 1;
+}
+.copy-btn[data-copied="true"] {
+	opacity: 0.9;
+}
+.copy-btn[data-copied="true"] .copy-icon {
+	display: none;
+}
+.copy-btn[data-copied="true"] .copy-done {
+	display: block;
+}
+
+/* ── Callouts ──────────────────────────────────────────────────────
+   Obsidian-style callouts rendered from `> [!type] title` blockquotes.
+   Per-type accent + Departure Mono glyph icon. */
+
+.callout {
+	--callout-accent: color-mix(in oklab, var(--fg) 40%, transparent);
+	--callout-bg: color-mix(in oklab, var(--fg) 4%, transparent);
+	margin: 24px 0;
+	padding: 14px 16px 14px 18px;
+	border-left: 3px solid var(--callout-accent);
+	background: var(--callout-bg);
+	border-radius: 0 2px 2px 0;
+}
+.callout > :first-child {
+	margin-top: 0;
+}
+.callout > :last-child {
+	margin-bottom: 0;
+}
+
+.callout-title {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-family: var(--mono);
+	font-size: 11px;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--callout-accent);
+	margin: 0 0 8px 0;
+}
+.callout-icon {
+	font-family: "Departure Mono", var(--mono);
+	font-style: normal;
+	display: inline-block;
+	line-height: 1;
+}
+.callout-icon::before {
+	content: var(--callout-glyph, "");
+}
+
+/* Per-type accents + Departure Mono glyph mapping.
+   Each glyph below is verified to exist in DepartureMono-Regular.woff2. */
+.callout-note     { --callout-accent: #5b8def; --callout-glyph: "✦"; }
+.callout-info     { --callout-accent: #3b82f6; --callout-glyph: "◊"; }
+.callout-tip      { --callout-accent: #0ea47a; --callout-glyph: "★"; }
+.callout-success  { --callout-accent: #16a34a; --callout-glyph: "→"; }
+.callout-warning  { --callout-accent: #d97706; --callout-glyph: "▲"; }
+.callout-failure  { --callout-accent: #dc2626; --callout-glyph: "×"; }
+.callout-danger   { --callout-accent: #dc2626; --callout-glyph: "!"; }
+.callout-bug      { --callout-accent: #b91c1c; --callout-glyph: "■"; }
+.callout-example  { --callout-accent: #7c3aed; --callout-glyph: "►"; }
+.callout-quote    { --callout-accent: #6b7280; --callout-glyph: "“"; }
+.callout-abstract { --callout-accent: #0891b2; --callout-glyph: "◌"; }
+.callout-todo     { --callout-accent: #2563eb; --callout-glyph: "□"; }
+.callout-question { --callout-accent: #7c3aed; --callout-glyph: "?"; }
