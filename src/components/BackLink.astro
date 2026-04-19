@@ -6,15 +6,12 @@ const { href, label } = Astro.props;
 
 <style>
   .back-link {
-    position: sticky; top: 16px; z-index: 20;
     display: inline-block; width: fit-content;
     font-family: var(--mono); font-size: 12px;
     text-transform: uppercase; letter-spacing: 0.06em;
     color: var(--fg); text-decoration: none;
     margin-bottom: 24px;
     padding: 6px 10px;
-    background: color-mix(in oklab, var(--bg) 85%, transparent);
-    backdrop-filter: blur(6px);
     border: 1px solid var(--rule);
   }
   .back-link:hover { color: var(--link); border-color: var(--fg); }
