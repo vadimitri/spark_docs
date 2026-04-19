@@ -74,8 +74,3 @@ npm run build     # static build into dist/
 npm run preview   # preview the built site locally
 npm test          # vitest
 ```
-
-## Contributing
-
-Fork, branch, PR. Keep PRs small and focused. Site deploys are handled by a
-core maintainer — contributors don't need deploy access to be useful.
