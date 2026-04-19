@@ -1,27 +1,83 @@
 ---
 import "../styles/global.css";
 interface Props {
-  title: string;
-  description?: string;
+	title: string;
+	description?: string;
 }
-const { title, description = "Spark — HPI maker club workshops." } = Astro.props;
+const { title, description = "Spark" } = Astro.props;
 ---
+
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{title}</title>
-  <meta name="description" content={description} />
-  <script is:inline>
-    // Apply persisted theme before paint to avoid flash
-    try {
-      const t = localStorage.getItem("spark-theme");
-      if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
-    } catch (_) {}
-  </script>
-</head>
-<body>
-  <slot />
-</body>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<script is:inline>
+			// Apply persisted theme + color overrides before paint to avoid flash
+			try {
+				const t = localStorage.getItem("spark-theme");
+				if (t === "light" || t === "dark")
+					document.documentElement.dataset.theme = t;
+				const active =
+					document.documentElement.dataset.theme ||
+					(matchMedia("(prefers-color-scheme: dark)").matches
+						? "dark"
+						: "light");
+				const raw = localStorage.getItem("spark-colors-" + active);
+				if (raw) {
+					const v = JSON.parse(raw);
+					for (const k of ["bg", "fg", "link"]) {
+						if (v && typeof v[k] === "string")
+							document.documentElement.style.setProperty(
+								"--" + k,
+								v[k],
+							);
+					}
+				}
+			} catch (_) {}
+		</script>
+	</head>
+	<body>
+		<slot />
+		<script is:inline>
+			(() => {
+				const attach = () => {
+					const blocks = document.querySelectorAll("pre > code.hljs");
+					for (const code of blocks) {
+						const pre = code.parentElement;
+						if (!pre || pre.parentElement?.classList.contains("code-block")) continue;
+						const wrap = document.createElement("div");
+						wrap.className = "code-block";
+						pre.replaceWith(wrap);
+						wrap.appendChild(pre);
+						const btn = document.createElement("button");
+						btn.type = "button";
+						btn.className = "copy-btn";
+						btn.setAttribute("aria-label", "Copy code");
+						btn.innerHTML =
+							'<span class="copy-icon" aria-hidden="true"></span><span class="copy-done" aria-hidden="true">✓</span>';
+						btn.addEventListener("click", async () => {
+							try {
+								await navigator.clipboard.writeText(code.textContent ?? "");
+								btn.dataset.copied = "true";
+								setTimeout(() => {
+									delete btn.dataset.copied;
+								}, 1500);
+							} catch (_) {}
+						});
+						wrap.appendChild(btn);
+					}
+				};
+				if (document.readyState === "loading") {
+					document.addEventListener("DOMContentLoaded", attach);
+				} else {
+					attach();
+				}
+			})();
+		</script>
+	</body>
 </html>

@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { defineCollection, z } from "astro:content";
 import { loadContent } from "./lib/load-content";
-import { slugify, stripNumericPrefix } from "./lib/slugify";
+import { slugify, stripNumericPrefix, shortName } from "./lib/slugify";
 
 const workshops = defineCollection({
   loader: {
@@ -11,13 +11,13 @@ const workshops = defineCollection({
       store.clear();
       for (const node of hierarchy.byFilename.values()) {
         const baseTitle =
-          node.title ?? stripNumericPrefix(node.filename.replace(/\.md$/, ""));
+          node.title ?? stripNumericPrefix(shortName(node.filename));
         const slug = slugify(baseTitle);
         const rootNode = hierarchy.byFilename.get(node.workshopRootFilename)!;
         const workshopSlug = slugify(
           rootNode.title ??
             stripNumericPrefix(
-              node.workshopRootFilename.replace(/\.md$/, ""),
+              shortName(node.workshopRootFilename),
             ),
         );
         const body = node.rawContent ?? "";

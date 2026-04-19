@@ -37,3 +37,6 @@ texture.svg
 DepartureMono-1.500/
 website/
 docs/
+
+# build output — populated by copy-images.ts from CONTENT_PATH at build time
+public/images/

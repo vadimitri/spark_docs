@@ -1,69 +1,116 @@
 ---
 import Base from "../layouts/Base.astro";
-import ThemeToggle from "../components/ThemeToggle.astro";
-import DottedRule from "../components/DottedRule.astro";
 import WorkshopCard from "../components/WorkshopCard.astro";
 import Footer from "../components/Footer.astro";
 import { loadContent } from "../lib/load-content";
-import { slugify, stripNumericPrefix } from "../lib/slugify";
+import { slugify, stripNumericPrefix, shortName } from "../lib/slugify";
 
 const { hierarchy } = loadContent();
 
 const cards = hierarchy.workshops.map((w) => {
-  const title = w.title ?? stripNumericPrefix(w.filename.replace(/\.md$/, ""));
-  const wordCount = [w, ...w.children].reduce(
-    (sum, n) => sum + (n.rawContent ?? "").split(/\s+/).filter(Boolean).length,
-    0
-  );
-  return {
-    href: `/${slugify(title)}`,
-    title,
-    description: w.description,
-    cover: w.cover,
-    pageCount: 1 + w.children.length,
-    wordCount,
-  };
+	const title = w.title ?? stripNumericPrefix(shortName(w.filename));
+	const wordCount = [w, ...w.children].reduce(
+		(sum, n) =>
+			sum + (n.rawContent ?? "").split(/\s+/).filter(Boolean).length,
+		0,
+	);
+	return {
+		href: `/${slugify(title)}`,
+		title,
+		description: w.description,
+		cover: w.cover,
+		pageCount: 1 + w.children.length,
+		wordCount,
+	};
 });
 ---
-<Base title="Spark — HPI maker club">
-  <ThemeToggle />
-  <section class="home">
-    <div class="home-hero">
-      <div class="logo-slot">[ SPARK LOGO + STAR PLACEHOLDER ]</div>
-      <div class="home-byline">
-        <span class="label">Spark · HPI Maker Club</span>
-        <p>Workshops written and built by students of the Hasso Plattner Institute.</p>
-      </div>
-    </div>
-    <DottedRule />
-    <div class="workshop-list">
-      {cards.map((c) => <WorkshopCard {...c} />)}
-    </div>
-  </section>
-  <Footer />
+
+<Base title="Spark">
+	<section class="home">
+		<div class="home-hero">
+			<div class="home-byline">
+				<span class="label">Spark Docs</span>
+				<p>Workshops written and built by the Spark Community</p>
+			</div>
+			<div class="logo-slot">
+				<span class="home-star" role="img" aria-label="Spark star"
+				></span>
+			</div>
+		</div>
+		<hr class="home-rule" />
+		<div class="workshop-list">
+			{cards.map((c) => <WorkshopCard {...c} />)}
+		</div>
+	</section>
+	<Footer />
 </Base>
 
 <style>
-  .home { max-width: 1400px; margin: 0 auto; padding: 32px; }
-  .home-hero {
-    min-height: 70vh;
-    display: grid; grid-template-columns: 1fr; gap: 48px;
-    align-items: end;
-    padding: 80px 0 48px;
-  }
-  @media (min-width: 1024px) {
-    .home-hero { grid-template-columns: 1.4fr 1fr; gap: 6%; padding: 96px 0 64px; }
-  }
-  .logo-slot {
-    border: 1px dashed var(--rule);
-    aspect-ratio: 16 / 7;
-    display: grid; place-items: center;
-    font-family: var(--mono); font-size: 12px;
-    text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
-    background-image: var(--texture); background-repeat: repeat;
-  }
-  .home-byline { font-size: 21px; line-height: 1.55; }
-  .home-byline .label { display: block; margin-bottom: 12px; font-size: 12px; }
-  @media (min-width: 1024px) { .home-byline { text-align: right; } }
-  .workshop-list { margin-top: 96px; display: grid; gap: 80px; }
+	.home {
+		max-width: 1400px;
+		margin: 0 auto;
+		padding: 32px;
+	}
+	.home-hero {
+		min-height: 10vh;
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 48px;
+		align-items: center;
+		padding: 48px 32px;
+		background-image: var(--texture);
+		background-repeat: repeat;
+		inset: 8px;
+		background-origin: content-box;
+		background-clip: content-box;
+		border: 1px solid var(--rule);
+		padding: 12px;
+	}
+	@media (min-width: 1024px) {
+		.home-hero {
+			grid-template-columns: 1.4fr 1fr;
+			gap: 6%;
+			//padding: 64px 48px;
+		}
+	}
+	.logo-slot {
+		aspect-ratio: 16 / 7;
+		display: grid;
+		place-items: center;
+		padding: 24px;
+	}
+	.home-star {
+		display: block;
+		width: min(100%, 360px);
+		aspect-ratio: 356 / 411;
+		background: var(--fg);
+		-webkit-mask: url("/star_monocolor.svg") center / contain no-repeat;
+		mask: url("/star_monocolor.svg") center / contain no-repeat;
+	}
+	.home-byline {
+		font-size: 21px;
+		line-height: 1;
+		margin-top: 8px;
+		margin-left: 8px;
+		text-align: left;
+	}
+	.home-byline .label {
+		font-family: var(--mono);
+		display: block;
+
+		font-size: 80px;
+	}
+	.home-byline p {
+		margin-top: 4px;
+	}
+	.workshop-list {
+		margin-top: 96px;
+		display: grid;
+		gap: 80px;
+	}
+	.home-rule {
+		margin: 48px 0;
+		border: 0;
+		border-top: 1px solid var(--rule);
+	}
 </style>

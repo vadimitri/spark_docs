@@ -34,7 +34,7 @@ export function parseFrontmatter(source: string): {
   const up = raw.up;
   if (typeof up === "string") {
     const t = extractWikiTarget(up);
-    if (t) upTargets.push(t);
+    upTargets.push(t ?? up.trim());
   } else if (Array.isArray(up)) {
     for (const entry of up) {
       if (typeof entry !== "string") continue;

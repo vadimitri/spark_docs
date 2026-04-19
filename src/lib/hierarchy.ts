@@ -26,7 +26,7 @@ export interface Hierarchy {
 }
 
 function basename(filename: string): string {
-  return filename.replace(/\.md$/i, "");
+  return filename.split("/").pop()!.replace(/\.md$/i, "");
 }
 
 export function buildHierarchy(pages: RawPage[]): Hierarchy {
@@ -43,6 +43,7 @@ export function buildHierarchy(pages: RawPage[]): Hierarchy {
     };
     byFilename.set(p.filename, node);
     byBasename.set(basename(p.filename), node);
+    byBasename.set(p.filename.replace(/\.md$/i, ""), node);
   }
 
   // Resolve parent (one hop — the parent is directly the byBasename lookup of the first upTarget)

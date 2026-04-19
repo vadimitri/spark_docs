@@ -1,5 +1,9 @@
 const NUMERIC_PREFIX_RE = /^\d+[\s\-_]+/;
 
+export function shortName(filename: string): string {
+  return filename.split("/").pop()!.replace(/\.md$/i, "");
+}
+
 export function stripNumericPrefix(input: string): string {
   return input.replace(NUMERIC_PREFIX_RE, "");
 }
