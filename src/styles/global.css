@@ -7,7 +7,7 @@
 	--muted: color-mix(in oklab, var(--fg) 50%, var(--bg));
 	--muted-2: color-mix(in oklab, var(--fg) 25%, var(--bg));
 	--rule: color-mix(in oklab, var(--fg) 60%, var(--bg));
-	--texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='3'><line x1='0' y1='0' x2='0' y2='1' stroke='%230E003B' stroke-opacity='0.5' stroke-width='1'/></svg>");
+	--texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='3'><line x1='0' y1='0' x2='0' y2='1' stroke='%230E003B' stroke-opacity='0.7' stroke-width='1'/></svg>");
 	--content-w: 720px;
 	--serif:
 		"EB Garamond", "Iowan Old Style", Garamond, "Times New Roman", serif;
@@ -22,7 +22,7 @@
 	--bg: #101010;
 	--fg: #ffffff;
 	--link: #3a88fe;
-	--texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='3'><line x1='0' y1='0' x2='0' y2='1' stroke='%239EC8FF' stroke-opacity='0.18' stroke-width='1'/></svg>");
+	--texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='3'><line x1='0' y1='0' x2='0' y2='1' stroke='%239EC8FF' stroke-opacity='0.45' stroke-width='1'/></svg>");
 }
 
 @media (prefers-color-scheme: dark) {
@@ -30,7 +30,7 @@
 		--bg: #101010;
 		--fg: #ffffff;
 		--link: #3a88fe;
-		--texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='3'><line x1='0' y1='0' x2='0' y2='1' stroke='%239EC8FF' stroke-opacity='0.18' stroke-width='1'/></svg>");
+		--texture: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='3'><line x1='0' y1='0' x2='0' y2='1' stroke='%239EC8FF' stroke-opacity='0.45' stroke-width='1'/></svg>");
 	}
 }
 
