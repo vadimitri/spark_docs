@@ -31,10 +31,11 @@ const { items } = Astro.props;
   }
   .toc ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
   .toc a {
-    color: var(--muted); text-decoration: none;
+    color: color-mix(in oklab, var(--fg) 75%, var(--bg));
+    text-decoration: none;
     display: block; line-height: 1.4;
   }
-  .toc a:hover { color: var(--fg); }
+  .toc a:hover { color: var(--link); }
   .toc li.active a { color: var(--link); }
 
   /* Tier styles — chapter (mono small caps), then serif hierarchy */
